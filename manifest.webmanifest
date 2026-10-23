@@ -1,0 +1,16 @@
+{
+  "name": "IT Pojmy",
+  "short_name": "Pojmy",
+  "description": "Osobní IT knowledge base, která funguje i bez internetu.",
+  "lang": "cs",
+  "start_url": "./#/dnes",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f4f6f8",
+  "theme_color": "#f4f6f8",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

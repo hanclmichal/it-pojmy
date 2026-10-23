@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>IT Pojmy</title>
+<meta name="description" content="Osobní IT knowledge base, která funguje i bez internetu.">
+<meta name="theme-color" content="#f4f6f8">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Pojmy">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="stylesheet" href="styles.css">
+<script src="vendor/marked.min.js" defer></script>
+<script src="vendor/purify.min.js" defer></script>
+<script src="vendor/highlight.min.js" defer></script>
+<script src="vendor/hljs-gherkin.min.js" defer></script>
+<script src="vendor/hljs-powershell.min.js" defer></script>
+<script src="vendor/hljs-protobuf.min.js" defer></script>
+<script src="vendor/hljs-dockerfile.min.js" defer></script>
+<script type="module" src="app/main.js"></script>
+</head>
+<body>
+<header class="bar">
+  <button id="barBack" class="iconbtn" type="button" aria-label="Zpět" hidden></button>
+  <h1 id="barTitle" class="bar__title">IT Pojmy</h1>
+  <button id="syncBtn" class="syncbtn" type="button" data-state="off"><span class="syncbtn__dot" aria-hidden="true"></span><span id="syncText" class="syncbtn__text"></span></button>
+  <a id="gearBtn" class="iconbtn" href="#/nastaveni" aria-label="Nastavení"></a>
+</header>
+<main id="view" class="view"></main>
+<nav class="tabs" aria-label="Hlavní navigace">
+  <a href="#/dnes" data-tab="dnes"><svg viewBox="0 0 24 24" class="ico" aria-hidden="true"><path d="M4 6h16M4 6v13a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1V6M8 3v4M16 3v4M8.5 14l2.5 2.5 5-5"/></svg><span>Dnes</span></a>
+  <a href="#/pojmy" data-tab="pojmy"><svg viewBox="0 0 24 24" class="ico" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/></svg><span>Pojmy</span></a>
+  <a href="#/prehled" data-tab="prehled"><svg viewBox="0 0 24 24" class="ico" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Přehled</span></a>
+</nav>
+<div id="update" class="update" role="status" hidden><span>Je k dispozici nová verze aplikace.</span><button type="button" class="btn btn--sm btn--primary">Načíst</button></div>
+<noscript><p style="padding:24px">Aplikace potřebuje zapnutý JavaScript.</p></noscript>
+</body>
+</html>
