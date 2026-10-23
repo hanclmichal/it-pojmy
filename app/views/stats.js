@@ -72,7 +72,7 @@ export function render(root, params, nav) {
       ['Pojmů', st.total],
       ['Čeká na opakování', st.overdue],
       ['Hotovo dnes', q ? `${doneIn(d)} z ${q.length}` : '0'],
-      ['Zkontrolováno', `${st.checked} z ${st.total}`]
+      [plural(streakOf(store.history.dny, today), 'Den v sérii', 'Dny v sérii', 'Dní v sérii'), String(streakOf(store.history.dny, today))]
     ].map(([l, v]) => h('div', { class: 'tile2' }, h('b', { text: String(v) }), h('span', { text: l }))));
     const lim = Number(store.history.nastaveni && store.history.nastaveni.denne) || 3;
     const hints = [];

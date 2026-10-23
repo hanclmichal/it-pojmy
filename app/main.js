@@ -12,7 +12,7 @@ import * as stats from './views/stats.js';
 import * as settings from './views/settings.js';
 import * as create from './views/create.js';
 
-export const APP_VERSION = '1.1.1';
+export const APP_VERSION = '1.1.2';
 
 const routes = [
   { re: /^#?\/?$/, view: today, tab: 'dnes' },

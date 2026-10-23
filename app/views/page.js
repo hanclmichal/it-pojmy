@@ -123,7 +123,6 @@ export function render(root, params, nav) {
       propRow('Úroveň', [h('i', { class: `dot lv${p.lvl < 0 ? 'n' : p.lvl}` }), lvlName(p.lvl)], () => selectSheet(p, 'uroven', 'Úroveň znalosti')),
       propRow('Opakovat', relDue(p.due), () => dateSheet(p)),
       propRow('Priorita', chip(p.meta.priorita || 'Nevyplněno', colorOf('priorita', p.meta.priorita)), () => selectSheet(p, 'priorita', 'Priorita')),
-      propRow('Stav', chip(p.meta.stav || 'Nevyplněno', colorOf('stav', p.meta.stav)), () => selectSheet(p, 'stav', 'Stav obsahu')),
       propRow('Definice', h('span', { class: 'prop__long', text: p.def || 'Nevyplněno' }), () => textSheet(p, 'definice', 'Definice', true)),
       p.created ? h('div', { class: 'prop' }, h('dt', { text: 'Vytvořeno' }), h('dd', null, h('span', { class: 'prop__static', text: dm(p.created) }))) : null);
 
