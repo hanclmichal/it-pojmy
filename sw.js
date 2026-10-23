@@ -1,6 +1,6 @@
 // Service worker: keeps the whole app available offline.
 // App files are precached per version; the Mermaid library from the CDN is cached on first use.
-const VERSION = 'v1.1.0';
+const VERSION = 'v1.1.1';
 const APP_CACHE = `app-${VERSION}`;
 const LIB_CACHE = 'libs-v1';
 const MERMAID = 'https://cdn.jsdelivr.net/npm/mermaid@11.12.0/dist/mermaid.min.js';

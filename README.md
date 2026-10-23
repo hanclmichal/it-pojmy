@@ -7,8 +7,8 @@ data drží v telefonu a synchronizuje je se soukromým úložištěm `hanclmich
 
 - **Dnes:** denní řada opakování (1–10 témat), hodnocení Nevím / Těžké / Dobré / Snadné,
   intervaly 1 / 7 / 30 / 90 dní, otázky z „Otestuj se“ jako kartičky, série dní.
-- **Pojmy:** pohledy z Notionu (Všechny pojmy, Dnes opakovat, Podle úrovně, Podle kategorie,
-  Ke kontrole) a hledání v názvech i v celém textu stránek.
+- **Pojmy:** pohledy Podle kategorie (rozbalovací seznamy), Dnes opakovat, Podle úrovně a Všechny pojmy
+  a hledání v názvech i v celém textu stránek.
 - **Stránka pojmu:** vlastnosti, obousměrné vazby „Souvisí s“, lišta sekcí, tabulky, zvýrazněný kód,
   diagramy Mermaid, rozbalovací bloky. Úpravy po sekcích, nová sekce, přejmenování, smazání.
 - **Nový pojem** ze šablony s výchozími hodnotami podle `schema.json` v datovém úložišti.

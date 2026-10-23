@@ -5,14 +5,13 @@ import { norm, parseDay, dayKey, plural, strip, LEVELS } from '../format.js';
 import { lvlName } from '../srs.js';
 
 export const VIEWS = [
-  { k: 'vse', name: 'Všechny pojmy', icon: '📚' },
+  { k: 'kategorie', name: 'Podle kategorie', icon: '🗂️' },
   { k: 'dnes', name: 'Dnes opakovat', icon: '🔁' },
   { k: 'uroven', name: 'Podle úrovně', icon: '📊' },
-  { k: 'kategorie', name: 'Podle kategorie', icon: '🗂️' },
-  { k: 'kontrola', name: 'Ke kontrole', icon: '🔍' }
+  { k: 'vse', name: 'Všechny pojmy', icon: '📚' }
 ];
 
-const state = { view: 'vse', q: '' };
+const state = { view: 'kategorie', q: '' };
 // categories opened in the "Podle kategorie" list, remembered on this device
 const OPEN_KEY = 'it-pojmy:open-categories';
 const openCats = new Set((() => { try { return JSON.parse(localStorage.getItem(OPEN_KEY) || '[]'); } catch (e) { return []; } })());
@@ -146,11 +145,6 @@ function viewCategories(pages, redraw) {
   ];
 }
 
-function viewReview(pages) {
-  const ps = pages.filter(p => !p.checked).sort(byCatTitle);
-  if (!ps.length) return [h('div', { class: 'note' }, h('strong', { text: 'Vše zkontrolováno.' }), h('p', { text: 'Žádná stránka nečeká na vaši kontrolu.' }))];
-  return [h('p', { class: 'muted count', text: `${ps.length} ${plural(ps.length, 'stránka je', 'stránky jsou', 'stránek je')} ve stavu Koncept.` }), ...viewAll(ps)];
-}
 
 export function render(root, params, nav) {
   nav.setTitle('Pojmy');
@@ -182,7 +176,7 @@ export function render(root, params, nav) {
       return;
     }
     const v = state.view;
-    put(body, v === 'dnes' ? viewToday(pages) : v === 'uroven' ? viewBoard(pages) : v === 'kategorie' ? viewCategories(pages, draw) : v === 'kontrola' ? viewReview(pages) : viewAll(pages));
+    put(body, v === 'dnes' ? viewToday(pages) : v === 'uroven' ? viewBoard(pages) : v === 'kategorie' ? viewCategories(pages, draw) : viewAll(pages));
   }
   input.addEventListener('input', () => { state.q = input.value; draw(); });
   draw();
