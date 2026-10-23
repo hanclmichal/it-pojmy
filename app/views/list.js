@@ -1,7 +1,7 @@
 // "Pojmy": the five database views from Notion plus full-text search.
 import { store } from '../store.js';
 import { h, put, icon, chip, fmtShort } from '../ui.js';
-import { norm, parseDay, dayKey, plural, LEVELS } from '../format.js';
+import { norm, parseDay, dayKey, plural, strip, LEVELS } from '../format.js';
 import { lvlName } from '../srs.js';
 
 export const VIEWS = [
@@ -13,6 +13,10 @@ export const VIEWS = [
 ];
 
 const state = { view: 'vse', q: '' };
+// categories opened in the "Podle kategorie" list, remembered on this device
+const OPEN_KEY = 'it-pojmy:open-categories';
+const openCats = new Set((() => { try { return JSON.parse(localStorage.getItem(OPEN_KEY) || '[]'); } catch (e) { return []; } })());
+const saveOpen = () => { try { localStorage.setItem(OPEN_KEY, JSON.stringify([...openCats])); } catch (e) { /* storage blocked */ } };
 const plainCache = new Map();
 
 export function colorOf(prop, value) {
@@ -72,12 +76,13 @@ function highlight(text, at, len) {
   return [text.slice(0, at), h('mark', { text: text.slice(at, at + len) }), text.slice(at + len)];
 }
 
-function byCatTitle(a, b) { return a.cat.localeCompare(b.cat, 'cs') || a.title.localeCompare(b.title, 'cs'); }
+const catCmp = (a, b) => strip(a).localeCompare(strip(b), 'cs');
+function byCatTitle(a, b) { return catCmp(a.cat, b.cat) || a.title.localeCompare(b.title, 'cs'); }
 
 function grouped(pages, keyFn, order) {
   const groups = new Map();
   for (const p of pages) { const k = keyFn(p) || 'Bez hodnoty'; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(p); }
-  const keys = [...groups.keys()].sort(order || ((a, b) => a.localeCompare(b, 'cs')));
+  const keys = [...groups.keys()].sort(order || catCmp);
   return keys.map(k => [k, groups.get(k)]);
 }
 
@@ -108,15 +113,37 @@ function viewBoard(pages) {
         h('span', { class: 'tile__d', text: dueText(p) }))))))))];
 }
 
-function viewGallery(pages) {
-  return grouped(pages, p => p.cat).map(([k, ps]) =>
-    h('section', { class: 'group' },
-      h('h3', { class: 'group__h' }, chip(k, colorOf('kategorie', k)), h('span', { class: 'group__n', text: String(ps.length) })),
-      h('ul', { class: 'gallery' }, ps.sort((a, b) => a.title.localeCompare(b.title, 'cs')).map(p => h('li', null, h('a', { class: 'gcard', href: `#/pojem/${p.id}` },
-        h('span', { class: 'gcard__icon', text: p.icon || '•', 'aria-hidden': 'true' }),
-        h('span', { class: 'gcard__t', text: p.title }),
-        h('span', { class: 'gcard__m' }, p.type ? chip(p.type, colorOf('typ', p.type), 'chip--sm') : null, h('span', null, h('i', { class: `dot lv${p.lvl < 0 ? 'n' : p.lvl}` }), lvlName(p.lvl))),
-        p.def ? h('span', { class: 'gcard__d', text: p.def }) : null))))));
+/** Level mix of a category as a small stacked bar (Nové → Ovládám). */
+function levelMix(ps) {
+  const n = [0, 1, 2, 3].map(i => ps.filter(p => p.lvl === i).length);
+  const known = n[2] + n[3];
+  return h('span', { class: 'mix', title: n.map((c, i) => `${lvlName(i)}: ${c}`).join(', ') },
+    h('span', { class: 'mix__bar', 'aria-hidden': 'true' }, n.map((c, i) => c ? h('i', { class: `lv${i}`, style: { flex: String(c) } }) : null)),
+    h('span', { class: 'mix__t', text: `umím ${known} z ${ps.length}` }));
+}
+
+function viewCategories(pages, redraw) {
+  const groups = grouped(pages, p => p.cat);
+  const all = groups.every(([k]) => openCats.has(k));
+  return [
+    h('div', { class: 'acc-tools' },
+      h('p', { class: 'muted', text: `${groups.length} ${plural(groups.length, 'kategorie', 'kategorie', 'kategorií')}, ${pages.length} ${plural(pages.length, 'pojem', 'pojmy', 'pojmů')}` }),
+      h('button', { class: 'linkbtn', type: 'button', onclick: () => { groups.forEach(([k]) => all ? openCats.delete(k) : openCats.add(k)); saveOpen(); redraw(); } }, all ? 'Sbalit vše' : 'Rozbalit vše')),
+    h('div', { class: 'acc' }, groups.map(([k, ps]) => {
+      const list = h('ul', { class: 'rows' });
+      const fill = () => { if (!list.childElementCount) list.append(...ps.sort((a, b) => a.title.localeCompare(b.title, 'cs')).map(p => row(p))); };
+      const d = h('details', { class: 'acc__item', open: openCats.has(k) },
+        h('summary', { class: 'acc__sum' }, h('span', { class: 'acc__row' },
+          chip(k, colorOf('kategorie', k)),
+          h('span', { class: 'acc__n', text: String(ps.length) }),
+          levelMix(ps),
+          h('span', { class: 'acc__chev', 'aria-hidden': 'true' }))),
+        list);
+      if (d.open) fill();
+      d.addEventListener('toggle', () => { if (d.open) { fill(); openCats.add(k); } else openCats.delete(k); saveOpen(); });
+      return d;
+    }))
+  ];
 }
 
 function viewReview(pages) {
@@ -155,7 +182,7 @@ export function render(root, params, nav) {
       return;
     }
     const v = state.view;
-    put(body, v === 'dnes' ? viewToday(pages) : v === 'uroven' ? viewBoard(pages) : v === 'kategorie' ? viewGallery(pages) : v === 'kontrola' ? viewReview(pages) : viewAll(pages));
+    put(body, v === 'dnes' ? viewToday(pages) : v === 'uroven' ? viewBoard(pages) : v === 'kategorie' ? viewCategories(pages, draw) : v === 'kontrola' ? viewReview(pages) : viewAll(pages));
   }
   input.addEventListener('input', () => { state.q = input.value; draw(); });
   draw();

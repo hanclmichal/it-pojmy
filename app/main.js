@@ -12,7 +12,7 @@ import * as stats from './views/stats.js';
 import * as settings from './views/settings.js';
 import * as create from './views/create.js';
 
-export const APP_VERSION = '1.0.0';
+export const APP_VERSION = '1.1.0';
 
 const routes = [
   { re: /^#?\/?$/, view: today, tab: 'dnes' },
@@ -92,7 +92,12 @@ function renderSync() {
   else if (status.error && status.error.code === 'offline') { state = 'offline'; text = pend ? `Offline, čeká ${pend}` : 'Offline'; }
   else if (status.error) { state = 'error'; text = 'Chyba synchronizace'; }
   else if (pend) { state = 'pending'; text = `Čeká ${pend} ${plural(pend, 'změna', 'změny', 'změn')}`; }
-  else { state = 'ok'; text = store.lastSync ? `Synchronizováno ${fmtTime.format(new Date(store.lastSync))}` : 'Synchronizováno'; }
+  else {
+    state = 'ok';
+    const t = store.lastSync ? new Date(store.lastSync) : null;
+    const sameDay = t && t.toDateString() === new Date().toDateString();
+    text = !t ? 'Synchronizováno' : sameDay ? `Aktuální ${t.toLocaleTimeString('cs-CZ', { hour: '2-digit', minute: '2-digit' })}` : `Aktuální k ${fmtTime.format(t)}`;
+  }
   btn.dataset.state = state;
   btn.setAttribute('aria-label', text);
   btn.title = text;

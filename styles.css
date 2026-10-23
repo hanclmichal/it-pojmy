@@ -438,3 +438,22 @@ select.field, .two select { appearance: none; -webkit-appearance: none; min-heig
   :root { --gutter: 24px; }
   .prose { font-size: 1.125rem; }
 }
+
+/* ---------- categories as collapsible lists ---------- */
+.acc-tools { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; padding: 12px 0 6px; font-size: .8125rem; }
+.acc { display: grid; gap: 8px; }
+.acc__item { border: 1px solid var(--rule); border-radius: 14px; background: var(--surface); }
+.acc__item > .rows { padding: 0 14px 4px; border-top: 1px solid var(--rule); }
+.acc__item > .rows .row:last-child { border-bottom: 0; }
+.acc__sum { display: block; padding: 10px 14px; cursor: pointer; list-style: none; }
+.acc__row { display: grid; grid-template-columns: auto auto 1fr auto; align-items: center; gap: 4px 10px; min-height: 36px; }
+.acc__sum::-webkit-details-marker { display: none; }
+.acc__sum .chip { font-size: .875rem; padding: 3px 9px; }
+.acc__n { font-weight: 650; font-size: .9375rem; }
+.acc__chev { width: 9px; height: 9px; margin-right: 4px; border-right: 2px solid var(--ink-3); border-bottom: 2px solid var(--ink-3); transform: rotate(45deg) translateY(-2px); transition: transform .15s; }
+.acc__item[open] .acc__chev { transform: rotate(-135deg) translateY(-2px); }
+.mix { display: grid; gap: 3px; justify-self: end; justify-items: end; min-width: 0; }
+.mix__bar { display: flex; gap: 1px; width: 72px; height: 6px; border-radius: 3px; overflow: hidden; background: var(--surface-2); }
+.mix__bar i { min-width: 2px; }
+.mix__t { font-size: .6875rem; color: var(--ink-3); white-space: nowrap; }
+@media (prefers-reduced-motion: reduce) { .acc__chev { transition: none; } }

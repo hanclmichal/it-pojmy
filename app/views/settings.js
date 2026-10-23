@@ -123,7 +123,7 @@ export function render(root, params, nav) {
           try { await sync(); toast('Staženo znovu.'); } catch (e) { toast(e.message); }
         }, true) }, 'Načíst vše znovu z GitHubu'))));
 
-    box.append(h('p', { class: 'muted small center', text: 'IT Pojmy 1.0 · data zůstávají v telefonu a ve vašem úložišti na GitHubu.' }));
+    box.append(h('p', { class: 'muted small center', text: 'IT Pojmy 1.1 · data zůstávají v telefonu a ve vašem úložišti na GitHubu.' }));
     put(root, box);
 
     // async details
