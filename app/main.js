@@ -12,8 +12,9 @@ import * as page from './views/page.js';
 import * as stats from './views/stats.js';
 import * as settings from './views/settings.js';
 import * as create from './views/create.js';
+import * as quiz from './views/quiz.js';
 
-export const APP_VERSION = '1.2.0';
+export const APP_VERSION = '1.3.0';
 
 const routes = [
   { re: /^#?\/?$/, view: today, tab: 'dnes' },
@@ -21,6 +22,7 @@ const routes = [
   { re: /^#\/pojmy$/, view: list, tab: 'pojmy' },
   { re: /^#\/pojem\/([0-9a-f]{32})$/, view: page, tab: 'pojmy', back: true },
   { re: /^#\/novy$/, view: create, tab: 'pojmy', back: true },
+  { re: /^#\/kviz$/, view: quiz, tab: 'kviz' },
   { re: /^#\/prehled$/, view: stats, tab: 'prehled' },
   { re: /^#\/nastaveni$/, view: settings, tab: null, back: true }
 ];

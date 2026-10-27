@@ -40,7 +40,8 @@ export function parseGlossary(text) {
 
 const esc = s => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
-function formPattern(form) {
+/** Regex source for one form (also used by the quiz to hide a term's name in its definition). */
+export function formPattern(form) {
   const parts = form.split(/\s+/).map(w => {
     const c = w[0];
     // a word written with a lower-case initial also matches Title Case ("refresh token" → "Refresh Token")

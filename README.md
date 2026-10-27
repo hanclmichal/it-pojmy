@@ -14,6 +14,11 @@ data drží v telefonu a synchronizuje je se soukromým úložištěm `hanclmich
 - **Vysvětlivky:** odborné výrazy ze slovníčku `slovnik.json` v datovém úložišti jsou v textu tečkovaně
   podtržené (první výskyt v každé sekci). Klepnutí ukáže krátké vysvětlení v bublině u slova,
   případně s odkazem na stránku pojmu. Pravidla slovníčku popisuje `CLAUDE.md` v datovém úložišti.
+- **Kvíz:** otázky s možnostmi A–D z definic pojmů, typ „Najdi definici“, „Najdi pojem“ nebo mix.
+  Špatné možnosti jsou hlavně pojmy ze stejné kategorie, název pojmu je v definici skrytý (tvary
+  ze `slovnik.json`). Výběr podle kategorie a úrovně, častěji přijdou nové a minule chybné pojmy.
+  Chybné odpovědi jde zopakovat nebo přidat do dnešního opakování. Statistika kvízu zůstává
+  v telefonu, úrovně a termíny opakování kvíz nemění.
 - **Nový pojem** ze šablony s výchozími hodnotami podle `schema.json` v datovém úložišti.
 - **Přehled:** úrovně znalosti, kategorie, termíny na 14 dní, historie opakování.
 - **Offline:** service worker drží celou aplikaci, IndexedDB celou knowledge base. Změny se odešlou
@@ -37,7 +42,7 @@ se změněným blobem a odešle všechny změny z telefonu jako jeden commit (je
 
 ```
 index.html, styles.css, sw.js, manifest.webmanifest
-app/        moduly aplikace (ES modules, bez build kroku), glossary.js = vysvětlivky
+app/        moduly aplikace (ES modules, bez build kroku), glossary.js = vysvětlivky, quiz.js = kvíz
   views/    obrazovky
 vendor/     marked 4.3.0, DOMPurify 3.4.17, highlight.js 11.12.0 (+ licence)
 icons/      ikony aplikace
