@@ -115,7 +115,7 @@ export function render(root, params, nav) {
 
     box.append(h('section', { class: 'panel' },
       h('h2', { text: 'Knowledge base' }),
-      h('p', { text: `${store.pages.size} ${plural(store.pages.size, 'pojem', 'pojmy', 'pojmů')} v telefonu.` }),
+      h('p', { text: `${store.pages.size} ${plural(store.pages.size, 'pojem', 'pojmy', 'pojmů')} v telefonu.` + (store.glossary.length ? ` Slovníček vysvětlivek: ${store.glossary.length} ${plural(store.glossary.length, 'heslo', 'hesla', 'hesel')}.` : '') }),
       h('div', { class: 'row-actions row-actions--wrap' },
         store.rules ? h('button', { class: 'btn', type: 'button', onclick: () => { const d = h('div', { class: 'prose' }); mount(d, store.rules.replace(/^# .*\n/, '')); openSheet('Pravidla knowledge base', d, { full: true }); } }, 'Pravidla knowledge base') : null,
         h('button', { class: 'btn btn--danger-quiet', type: 'button', onclick: () => confirmSheet('Načíst vše znovu?', pend.length ? `Smaže kopii v telefonu i ${pend.length} neodeslaných změn a stáhne vše znovu z GitHubu.` : 'Smaže kopii v telefonu a stáhne vše znovu z GitHubu.', 'Načíst znovu', async () => {
@@ -123,7 +123,7 @@ export function render(root, params, nav) {
           try { await sync(); toast('Staženo znovu.'); } catch (e) { toast(e.message); }
         }, true) }, 'Načíst vše znovu z GitHubu'))));
 
-    box.append(h('p', { class: 'muted small center', text: 'IT Pojmy 1.1 · data zůstávají v telefonu a ve vašem úložišti na GitHubu.' }));
+    box.append(h('p', { class: 'muted small center', text: 'IT Pojmy 1.2 · data zůstávají v telefonu a ve vašem úložišti na GitHubu.' }));
     put(root, box);
 
     // async details

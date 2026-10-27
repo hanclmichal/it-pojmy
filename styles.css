@@ -21,6 +21,7 @@
   --danger: #b42318;
   --mark: #fde68a;
   --shadow: 0 1px 2px rgba(15, 30, 50, .06), 0 4px 16px rgba(15, 30, 50, .06);
+  --pop-shadow: 0 1px 3px rgba(15, 30, 50, .08), 0 10px 32px rgba(15, 30, 50, .18);
 
   --lv0: #86b6ef; --lv1: #3987e5; --lv2: #1c5cab; --lv3: #0d366b; --lvn: #c4cdd9;
   --lv0-on: #0b1623; --lv1-on: #0b1623; --lv2-on: #ffffff; --lv3-on: #ffffff;
@@ -50,7 +51,7 @@
   :root:not([data-theme="light"]) {
     --bg: #0f1215; --surface: #171b20; --surface-2: #20262d; --ink: #e8ebef; --ink-2: #b4bcc6; --ink-3: #8e98a4;
     --rule: #2a3139; --accent: #82b1ee; --accent-ink: #0b1623; --accent-soft: #1a2a3e; --warn: #f0b45a; --danger: #ff8a7a; --mark: #6b5310;
-    --shadow: 0 1px 2px rgba(0, 0, 0, .3);
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3); --pop-shadow: 0 1px 3px rgba(0, 0, 0, .5), 0 12px 36px rgba(0, 0, 0, .55);
     --lv0: #184f95; --lv1: #256abf; --lv2: #5598e7; --lv3: #9ec5f4; --lvn: #2d3947;
     --lv0-on: #ffffff; --lv1-on: #ffffff; --lv2-on: #0b1623; --lv3-on: #0b1623;
     --c-default-bg: #373737; --c-default-fg: #e6e6e4; --c-gray-bg: #474645; --c-gray-fg: #e6e6e4; --c-brown-bg: #5b3f31; --c-brown-fg: #f1dfd6;
@@ -63,7 +64,7 @@
 :root[data-theme="dark"] {
   --bg: #0f1215; --surface: #171b20; --surface-2: #20262d; --ink: #e8ebef; --ink-2: #b4bcc6; --ink-3: #8e98a4;
   --rule: #2a3139; --accent: #82b1ee; --accent-ink: #0b1623; --accent-soft: #1a2a3e; --warn: #f0b45a; --danger: #ff8a7a; --mark: #6b5310;
-  --shadow: 0 1px 2px rgba(0, 0, 0, .3);
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3); --pop-shadow: 0 1px 3px rgba(0, 0, 0, .5), 0 12px 36px rgba(0, 0, 0, .55);
   --lv0: #184f95; --lv1: #256abf; --lv2: #5598e7; --lv3: #9ec5f4; --lvn: #2d3947;
   --lv0-on: #ffffff; --lv1-on: #ffffff; --lv2-on: #0b1623; --lv3-on: #0b1623;
   --c-default-bg: #373737; --c-default-fg: #e6e6e4; --c-gray-bg: #474645; --c-gray-fg: #e6e6e4; --c-brown-bg: #5b3f31; --c-brown-fg: #f1dfd6;
@@ -372,6 +373,34 @@ select.field, .two select { appearance: none; -webkit-appearance: none; min-heig
 .diagram figcaption { font: 400 .8125rem/1.4 var(--sans); color: var(--ink-3); }
 .diagram__src { overflow-x: auto; padding: 12px; border-radius: 12px; background: var(--surface); border: 1px dashed var(--rule); }
 .diagram__src code { background: none; padding: 0; font: 400 .75rem/1.5 var(--mono); white-space: pre; }
+
+/* ---------- glossary: underlined terms and their popover ---------- */
+.prose .gl {
+  cursor: pointer; border-radius: 3px;
+  text-decoration: underline dotted color-mix(in srgb, var(--accent) 80%, transparent);
+  text-decoration-thickness: 1.5px; text-underline-offset: 3px; text-decoration-skip-ink: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.prose .gl.on { background: var(--accent-soft); text-decoration-style: solid; box-shadow: 0 0 0 2px var(--accent-soft); }
+@media (hover: hover) { .prose .gl:hover { text-decoration-style: solid; } }
+.glpop {
+  position: absolute; z-index: 15; width: min(340px, calc(100vw - 24px));
+  padding: 12px 14px 13px; border: 1px solid var(--rule); border-radius: 14px;
+  background: var(--surface); color: var(--ink); box-shadow: var(--pop-shadow);
+  font: 400 .9375rem/1.45 var(--sans); text-align: left;
+  animation: glpop-in .14s ease-out;
+}
+.glpop[data-side="top"] { --glpop-from: -4px; }
+.glpop__arrow { position: absolute; width: 12px; height: 12px; margin-left: -6px; background: var(--surface); border: 1px solid var(--rule); transform: rotate(45deg); }
+.glpop[data-side="bottom"] .glpop__arrow { top: -7px; border-right: 0; border-bottom: 0; }
+.glpop[data-side="top"] .glpop__arrow { bottom: -7px; border-left: 0; border-top: 0; }
+.glpop__title { display: flex; gap: 6px; align-items: baseline; font-weight: 650; overflow-wrap: anywhere; }
+.glpop__icon { flex: none; }
+.glpop__text { margin-top: 4px; color: var(--ink-2); }
+.glpop__link { display: inline-flex; align-items: center; gap: 6px; min-height: 32px; margin-top: 6px; font-weight: 600; font-size: .875rem; color: var(--accent); text-decoration: none; }
+.glpop__chev { font-size: 1.15rem; line-height: 1; }
+@keyframes glpop-in { from { opacity: 0; transform: translateY(var(--glpop-from, 4px)); } }
+@media (prefers-reduced-motion: reduce) { .glpop { animation: none; } }
 
 .hljs-keyword, .hljs-selector-tag, .hljs-built_in, .hljs-type, .hljs-literal { color: var(--hl-kw); }
 .hljs-string, .hljs-regexp, .hljs-addition { color: var(--hl-str); }

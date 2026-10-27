@@ -3,6 +3,7 @@ import { store, updatePageMeta, updatePageBody, setRelations, deletePage, saveHi
 import { h, put, icon, chip, openSheet, closeSheet, confirmSheet, toast, fmtShort } from '../ui.js';
 import { splitSections, joinSections, sectionMark, sectionLabel, parseDay, dayKey, addDays, daysBetween, norm, LEVELS, INTERVALS, plural } from '../format.js';
 import { mount } from '../render.js';
+import { buildMatcher, annotate, closeGlossary } from '../glossary.js';
 import { lvlName, entryOf } from '../srs.js';
 import { colorOf } from './list.js';
 import { openEditor } from './editor.js';
@@ -85,7 +86,7 @@ function moreSheet(p, nav) {
 
 function keyOf(p) {
   const f = store.files.get(p.path);
-  return (f ? f.text : '') + '|' + p.dirty + '|' + p.rel.map(r => (store.pages.get(r) || {}).title).join(',');
+  return (f ? f.text : '') + '|' + p.dirty + '|' + p.rel.map(r => (store.pages.get(r) || {}).title).join(',') + '|' + store.glossaryRev;
 }
 
 export function render(root, params, nav) {
@@ -95,6 +96,7 @@ export function render(root, params, nav) {
 
   function draw() {
     if (observer) { observer.disconnect(); observer = null; }
+    closeGlossary();
     const p = store.pages.get(id);
     if (!p) {
       nav.setTitle('Pojem');
@@ -105,6 +107,8 @@ export function render(root, params, nav) {
     nav.setTitle(p.title);
     renderedText = keyOf(p);
     const { pre, sections } = splitSections(p.body);
+    // glossary: underline known terms, first occurrence of each per section
+    const terms = buildMatcher(store.glossary, { pages: store.pages, exclude: p.id, category: p.cat });
 
     const propRow = (label, value, onEdit) => h('div', { class: 'prop' },
       h('dt', { text: label }),
@@ -139,13 +143,14 @@ export function render(root, params, nav) {
       const body = h('div', { class: 'prose' });
       const rest = s.text.replace(/^# .*\n?/, '');
       mount(body, rest);
+      annotate(body, terms);
       return h('section', { class: 'sec', id: `s${i}`, 'data-i': String(i) },
         h('div', { class: 'sec__head' },
           h('h2', { class: 'sec__title' }, h('span', { class: 'sec__mark', text: sectionMark(s.title), 'aria-hidden': 'true' }), sectionLabel(s.title)),
           h('button', { class: 'iconbtn iconbtn--quiet', type: 'button', 'aria-label': `Upravit sekci ${sectionLabel(s.title)}`, onclick: () => editSection(p, i) }, icon('edit'))),
         body);
     });
-    const preEl = pre && pre.trim() ? (() => { const d = h('div', { class: 'prose' }); mount(d, pre); return h('section', { class: 'sec' }, d); })() : null;
+    const preEl = pre && pre.trim() ? (() => { const d = h('div', { class: 'prose' }); mount(d, pre); annotate(d, terms); return h('section', { class: 'sec' }, d); })() : null;
 
     const footer = h('footer', { class: 'pagefoot' },
       h('button', { class: 'btn', type: 'button', onclick: () => openEditor({ title: 'Nová sekce', text: '# 📝 Nová sekce\n\n', onSave: txt => updatePageBody(p.id, joinSections(pre, [...sections, { title: '', text: txt }])) }) }, 'Přidat sekci'),
@@ -201,7 +206,7 @@ export function render(root, params, nav) {
       draw();
       window.scrollTo(0, y);
     },
-    destroy() { if (observer) observer.disconnect(); },
+    destroy() { if (observer) observer.disconnect(); closeGlossary(); },
     keepScroll: true
   };
 }

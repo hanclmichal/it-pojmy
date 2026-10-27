@@ -5,6 +5,7 @@ import { persistStorage } from './db.js';
 import { $, h, put, icon, toast, closeAllSheets, fmtTime } from './ui.js';
 import { plural } from './format.js';
 import { rerenderDiagrams } from './render.js';
+import { initGlossary, closeGlossary } from './glossary.js';
 import * as today from './views/today.js';
 import * as list from './views/list.js';
 import * as page from './views/page.js';
@@ -12,7 +13,7 @@ import * as stats from './views/stats.js';
 import * as settings from './views/settings.js';
 import * as create from './views/create.js';
 
-export const APP_VERSION = '1.1.2';
+export const APP_VERSION = '1.2.0';
 
 const routes = [
   { re: /^#?\/?$/, view: today, tab: 'dnes' },
@@ -47,6 +48,7 @@ export function back(fallback) {
 
 function route() {
   closeAllSheets();
+  closeGlossary();
   if (current) {
     scrollMemo.set(current.key, window.scrollY);
     if (current.ctx && current.ctx.destroy) current.ctx.destroy();
@@ -151,6 +153,7 @@ async function start() {
   applyTheme(theme);
   matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => applyTheme((() => { try { return localStorage.getItem('theme'); } catch (e) { return null; } })() || 'system'));
 
+  initGlossary();
   $('#barBack').append(icon('back'));
   $('#barBack').addEventListener('click', () => back());
   $('#gearBtn').append(icon('gear'));

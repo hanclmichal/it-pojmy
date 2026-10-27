@@ -2,6 +2,7 @@
 import { files as fileDb, kv } from './db.js';
 import { parsePage, serializePage, levelIndex, priorityRank, slugify, newId, nowStamp, addDays, dayKey } from './format.js';
 import { parseHistory, serializeHistory } from './merge.js';
+import { parseGlossary } from './glossary.js';
 
 const listeners = new Set();
 export const store = {
@@ -12,11 +13,18 @@ export const store = {
   schema: null,
   template: '',
   rules: '',
+  glossary: [],            // headwords from slovnik.json
+  glossaryRev: 0,          // bumped whenever slovnik.json changes
   conn: null,              // { owner, repo, branch, token, api }
   head: null,              // last synced commit sha
   lastSync: null,
+  trackVersion: null,      // which set of tracked files the last full pull covered
   ready: false
 };
+
+/** Raise when `tracked` starts covering new files, so the next sync fetches them even if
+ *  the repository has not changed since the last sync. */
+export const TRACK_VERSION = 2;
 
 export function onChange(fn) { listeners.add(fn); return () => listeners.delete(fn); }
 let notifyQueued = false;
@@ -26,7 +34,7 @@ export function notify() {
   queueMicrotask(() => { notifyQueued = false; listeners.forEach(fn => { try { fn(); } catch (e) { console.error(e); } }); });
 }
 
-export const tracked = p => /^pojmy\/[^/]+\.md$/.test(p) || ['historie.json', 'schema.json', 'sablona.md', 'pravidla.md'].includes(p) || /^konflikty\/[^/]+\.md$/.test(p);
+export const tracked = p => /^pojmy\/[^/]+\.md$/.test(p) || ['historie.json', 'schema.json', 'sablona.md', 'pravidla.md', 'slovnik.json'].includes(p) || /^konflikty\/[^/]+\.md$/.test(p);
 
 export async function load() {
   const all = await fileDb.all();
@@ -34,12 +42,14 @@ export async function load() {
   store.conn = (await kv.get('conn')) || null;
   store.head = (await kv.get('head')) || null;
   store.lastSync = (await kv.get('lastSync')) || null;
+  store.trackVersion = (await kv.get('trackVersion')) || null;
   rebuild();
   store.ready = true;
   notify();
 }
 
-/** Recompute pages, history, schema and template from the files. */
+let glossaryText = '';
+/** Recompute pages, history, schema, template and glossary from the files. */
 export function rebuild() {
   store.pages = new Map();
   store.byPath = new Map();
@@ -56,6 +66,9 @@ export function rebuild() {
   store.template = t ? t.text : '';
   const r = store.files.get('pravidla.md');
   store.rules = r ? r.text : '';
+  const g = store.files.get('slovnik.json');
+  const gt = g && !g.deleted ? g.text : '';
+  if (gt !== glossaryText) { glossaryText = gt; store.glossary = parseGlossary(gt); store.glossaryRev++; }
 }
 
 function toPage(f) {
@@ -219,6 +232,7 @@ export function pendingFiles() {
 export async function setConn(conn) { store.conn = conn; await kv.set('conn', conn); notify(); }
 export async function setHead(sha) { store.head = sha; await kv.set('head', sha); }
 export async function setLastSync(t) { store.lastSync = t; await kv.set('lastSync', t); }
+export async function setTrackVersion(v) { store.trackVersion = v; await kv.set('trackVersion', v); }
 export async function resetLocal() {
   await fileDb.clear();
   store.files = new Map();

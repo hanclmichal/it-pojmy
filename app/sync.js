@@ -1,7 +1,7 @@
 // Synchronisation with the private GitHub repository through the Git Data API.
 // Pull: download files whose blob changed, merging with local edits.
 // Push: one commit with every local change, fast-forward only (retried after a fresh pull).
-import { store, tracked, setHead, setLastSync, commitFiles, pendingFiles } from './store.js';
+import { store, tracked, setHead, setLastSync, setTrackVersion, TRACK_VERSION, commitFiles, pendingFiles } from './store.js';
 import { mergeFile } from './merge.js';
 import { parsePage } from './format.js';
 
@@ -120,7 +120,7 @@ async function pull(gh) {
   const head = await gh.head();
   const commit = await gh.commit(head);
   const treeSha = commit.tree.sha;
-  if (head === store.head) return { count: 0, conflicts: 0, treeSha, head };
+  if (head === store.head && store.trackVersion === TRACK_VERSION) return { count: 0, conflicts: 0, treeSha, head };
 
   setStatus({ phase: 'Stahuji změny' });
   const remote = (await gh.tree(treeSha)).filter(e => tracked(e.path));
@@ -173,6 +173,7 @@ async function pull(gh) {
   }
   await commitFiles(changed, removed);
   await setHead(head);
+  if (store.trackVersion !== TRACK_VERSION) await setTrackVersion(TRACK_VERSION);
   return { count: toFetch.length + removed.length, conflicts, treeSha, head };
 }
 

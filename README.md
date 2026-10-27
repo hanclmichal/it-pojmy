@@ -11,6 +11,9 @@ data drží v telefonu a synchronizuje je se soukromým úložištěm `hanclmich
   a hledání v názvech i v celém textu stránek.
 - **Stránka pojmu:** vlastnosti, obousměrné vazby „Souvisí s“, lišta sekcí, tabulky, zvýrazněný kód,
   diagramy Mermaid, rozbalovací bloky. Úpravy po sekcích, nová sekce, přejmenování, smazání.
+- **Vysvětlivky:** odborné výrazy ze slovníčku `slovnik.json` v datovém úložišti jsou v textu tečkovaně
+  podtržené (první výskyt v každé sekci). Klepnutí ukáže krátké vysvětlení v bublině u slova,
+  případně s odkazem na stránku pojmu. Pravidla slovníčku popisuje `CLAUDE.md` v datovém úložišti.
 - **Nový pojem** ze šablony s výchozími hodnotami podle `schema.json` v datovém úložišti.
 - **Přehled:** úrovně znalosti, kategorie, termíny na 14 dní, historie opakování.
 - **Offline:** service worker drží celou aplikaci, IndexedDB celou knowledge base. Změny se odešlou
@@ -34,7 +37,7 @@ se změněným blobem a odešle všechny změny z telefonu jako jeden commit (je
 
 ```
 index.html, styles.css, sw.js, manifest.webmanifest
-app/        moduly aplikace (ES modules, bez build kroku)
+app/        moduly aplikace (ES modules, bez build kroku), glossary.js = vysvětlivky
   views/    obrazovky
 vendor/     marked 4.3.0, DOMPurify 3.4.17, highlight.js 11.12.0 (+ licence)
 icons/      ikony aplikace
